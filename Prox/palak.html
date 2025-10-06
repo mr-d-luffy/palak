@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Journey Palak</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        /* Define custom neon colors and fonts */
+        :root {
+            --neon-pink: #FF69B4; /* Deep, vibrant pink */
+            --neon-light: #FFC0CB; /* Lighter pink for core glow */
+            --neon-blue: #00FFFF; /* Secondary accent color for Palak's name and date */
+            --bg-dark: #0f0f2d; /* Dark, deep purple background */
+            --font-script: 'Great Vibes', cursive;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+        }
+
+        /* --- NEON TEXT GLOW EFFECT --- */
+        .neon-text-main {
+            color: var(--neon-light);
+            text-shadow:
+                0 0 7px var(--neon-light),
+                0 0 10px var(--neon-light),
+                0 0 21px var(--neon-pink),
+                0 0 42px var(--neon-pink),
+                0 0 82px var(--neon-pink),
+                0 0 92px var(--neon-pink),
+                0 0 102px var(--neon-pink),
+                0 0 151px var(--neon-pink);
+            transition: all 0.1s ease-in-out;
+        }
+
+        /* Neon Flickering Animation */
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow:
+                    0 0 4px var(--neon-light),
+                    0 0 11px var(--neon-light),
+                    0 0 19px var(--neon-pink),
+                    0 0 40px var(--neon-pink),
+                    0 0 80px var(--neon-pink);
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
+        
+        .flicker-animation {
+            animation: flicker 4s infinite alternate;
+        }
+
+        /* Palak Script Text Glow and Date Glow */
+        .neon-script {
+            font-family: var(--font-script);
+            color: var(--neon-blue);
+            text-shadow:
+                0 0 5px var(--neon-blue),
+                0 0 15px var(--neon-blue),
+                0 0 30px #00aaff,
+                0 0 50px #00aaff;
+        }
+
+        /* --- PARTICLE ANIMATION --- */
+        .particle {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        /* Heart shape using custom CSS box shadow/border */
+        .heart {
+            background-color: var(--neon-pink);
+            position: relative;
+            transform: rotate(-45deg);
+            width: 15px;
+            height: 15px;
+            box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+            border-radius: 5px;
+        }
+        .heart::before, .heart::after {
+            content: "";
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: var(--neon-pink);
+            box-shadow: inherit;
+        }
+        .heart::before {
+            top: -7.5px;
+            left: 0;
+        }
+        .heart::after {
+            left: 7.5px;
+            top: 0;
+        }
+
+        /* Star shape using SVG path for sharper lines */
+        .star {
+            width: 12px;
+            height: 12px;
+            filter: drop-shadow(0 0 5px var(--neon-light)) drop-shadow(0 0 10px var(--neon-pink));
+        }
+
+        /* Floating animation for particles */
+        @keyframes floatAndFade {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-300px) scale(0.5); opacity: 0; }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Card Container -->
+    <div id="card-container" class="relative w-full max-w-lg p-8 md:p-10 bg-black/30 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-pink-700/50 flex flex-col items-center text-center">
+        
+        <!-- Image from Uploads - Now using w-full and no max-h to respect original aspect ratio -->
+        <img 
+            src="photo_2025-10-06 10.29.07.jpeg" 
+            alt="A person looking at travel destinations" 
+            class="w-full h-auto object-cover rounded-xl mb-6 shadow-lg shadow-pink-500/50" 
+            onerror="this.onerror=null; this.src='https://placehold.co/400x250/0f0f2d/FF69B4?text=Happy+Journey+Image';"
+        />
+
+        <!-- Text Content -->
+        <h1 class="text-6xl md:text-8xl font-bold tracking-widest uppercase neon-text-main flicker-animation">
+            HAPPY
+        </h1>
+        <h1 class="text-6xl md:text-8xl font-bold tracking-widest uppercase neon-text-main flicker-animation mt-2">
+            JOURNEY
+        </h1>
+        
+        <p class="text-4xl md:text-6xl mt-8 neon-script">
+            Palak
+        </p>
+
+        <!-- Added Date -->
+        <p class="text-xl md:text-2xl mt-4 tracking-wider neon-script">
+            06-10-2025
+        </p>
+
+        <!-- Dynamic Particle/Love Element Container -->
+        <div id="particle-field" class="absolute inset-0 overflow-hidden">
+            <!-- Particles will be injected here by JavaScript -->
+        </div>
+
+    </div>
+
+    <!-- JavaScript for Particle Animation -->
+    <script>
+        const particleField = document.getElementById('particle-field');
+        const cardContainer = document.getElementById('card-container');
+        
+        const PARTICLE_COUNT = 30; // Number of floating particles
+        const SHAPES = ['star', 'heart'];
+
+        /**
+         * Creates an individual particle element (star or heart).
+         * @param {string} shapeType - 'star' or 'heart'
+         * @returns {HTMLElement} The created particle element.
+         */
+        function createParticle(shapeType) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            if (shapeType === 'star') {
+                // Use SVG for a sharp star shape
+                particle.innerHTML = `
+                    <svg class="star" viewBox="0 0 51 48" fill="var(--neon-pink)">
+                        <path d="M25.5 1l6.8 13.9 15.3 2.2-11 10.7 2.6 15L25.5 39l-13.9 7.3 2.6-15-11-10.7 15.3-2.2z"/>
+                    </svg>
+                `;
+            } else if (shapeType === 'heart') {
+                // Use CSS for a heart shape
+                particle.className += ' heart-container'; // Add a container class
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                particle.appendChild(heart);
+            }
+
+            // Random initial position
+            const containerRect = cardContainer.getBoundingClientRect();
+            
+            // Randomize position within the card area
+            const startX = Math.random() * containerRect.width;
+            const startY = containerRect.height; // Start from the bottom
+            
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+            
+            // Randomize duration and delay for varied animation
+            const duration = 5 + Math.random() * 5; // 5 to 10 seconds
+            const delay = Math.random() * 10; // 0 to 10 seconds delay
+
+            // Apply the floating animation
+            particle.style.animation = `floatAndFade ${duration}s ease-out ${delay}s infinite`;
+
+            return particle;
+        }
+
+        /**
+         * Initializes all the particle animations.
+         */
+        function initParticles() {
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                // Alternate between stars and hearts
+                const shape = SHAPES[i % SHAPES.length];
+                const particle = createParticle(shape);
+                particleField.appendChild(particle);
+            }
+        }
+
+        window.onload = initParticles;
+    </script>
+</body>
+</html>
